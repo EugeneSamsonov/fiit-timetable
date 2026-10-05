@@ -1,0 +1,13 @@
+# Артефакты сборки
+node_modules/
+.backup_*/
+dist/
+
+# Отладочное
+inspect.js
+*.bak
+*.tmp
+
+# Системное
+.DS_Store
+Thumbs.db
