@@ -1,96 +1,139 @@
 #!/usr/bin/env bash
-# cleanup.sh — приводит папку проекта в порядок:
-#   • удаляет бэкапы, node_modules, служебные файлы
-#   • оставляет только нужное для работы и разработки
-#   • создаёт .gitignore и README.md
+# fix-prefix.sh — использует m[1] как subject
 #
-# Запуск: bash cleanup.sh
-# С флагом --hard — удалит ВСЁ, кроме исходников и dist/:
-#   bash cleanup.sh --hard
+# Запуск: bash fix-prefix.sh
 
 set -e
-HARD=0
-[ "$1" = "--hard" ] && HARD=1
+cd "$(dirname "$0")"
 
-echo "▶ Папка: $(pwd)"
+TS=$(date +%Y%m%d_%H%M%S)
+cp build.js ".backup_$TS.build.js"
+echo "▶ Бэкап: .backup_$TS.build.js"
+
+node - <<'NODE_FIX'
+const fs = require("fs");
+let js = fs.readFileSync("build.js", "utf8");
+
+if(!/function parseSubgroups\b/.test(js)){
+  console.error("❌ нет parseSubgroups");
+  process.exit(1);
+}
+
+const newFn = `function parseSubgroups(text){
+  if(!text) return null;
+  const s = String(text);
+  if(!/\\d+п\\/г/.test(s)) return null;
+
+  const parts = s.split(/\\s*;\\s*/);
+  const out = [];
+
+  for(const p of parts){
+    if(!p.trim()) continue;
+
+    const m = p.match(/^(.*?)\\s*(\\d+п\\/г)\\s*(.*)$/);
+    if(!m) continue;
+
+    const prefix = m[1].trim();      // ← "БД", "Ин.яз" (предмет до 1п/г)
+    const sub    = m[2];             // ← "1п/г"
+    let rest     = m[3].trim();      // ← "Шахбанова З.И. 2.3"
+
+    // 1. Аудитория с конца
+    let room = "";
+    const roomRe = /\\s([0-9]{1,2}\\.[0-9]{1,2}|[0-9]{3}\\s*ЭФ|ВЦ|МИЦ|ПО|планет|Спортзал)$/i;
+    const rm = rest.match(roomRe);
+    if(rm){
+      room = rm[1].trim();
+      rest = rest.slice(0, rest.length - rm[0].length).trim();
+    }
+
+    // 2. Преподаватель с конца
+    let teacher = "";
+    const teachRe1 = /(?:^|\\s)([А-ЯЁ][а-яёА-ЯЁ\\-]+\\s+[А-ЯЁ]\\.\\s*[А-ЯЁ]\\.)$/;
+    const teachRe2 = /(?:^|\\s)([А-ЯЁ][а-яёА-ЯЁ\\-]+\\s+[А-ЯЁ]\\.\\s*[А-ЯЁ])$/;
+    const teachRe3 = /(?:^|\\s)([А-ЯЁ][а-яёА-ЯЁ\\-]+\\s+[А-ЯЁ]\\.?)$/;
+
+    let tm = rest.match(teachRe1) || rest.match(teachRe2) || rest.match(teachRe3);
+    if(tm){
+      teacher = tm[1].trim();
+      rest = rest.slice(0, tm.index).trim();
+    }
+
+    // 3. Если остался хвост "ПО"/"МИЦ" и room пуст
+    if(!room){
+      const tailRoom = /\\s([0-9]{1,2}\\.[0-9]{1,2}|[0-9]{3}\\s*ЭФ|ВЦ|МИЦ|ПО|планет|Спортзал)$/i;
+      const tr = rest.match(tailRoom);
+      if(tr){
+        room = tr[1].trim();
+        rest = rest.slice(0, rest.length - tr[0].length).trim();
+      }
+    }
+
+    // 4. Если teacher всё ещё пуст — последняя попытка
+    if(!teacher){
+      const t2 = rest.match(/\\s([А-ЯЁ][а-яёА-ЯЁ\\-]+\\s+[А-ЯЁ]\\.\\s*[А-ЯЁ]\\.?)$/);
+      if(t2){
+        teacher = t2[1].trim();
+        rest = rest.slice(0, t2.index).trim();
+      }
+    }
+
+    // 5. ПРЕДМЕТ = prefix (то, что было до 1п/г), либо остаток rest
+    let subject = prefix;
+    if(!subject){
+      subject = rest.replace(/^[;,.·\\s]+|[;,.·\\s]+$/g, "").trim();
+    }
+
+    out.push({ sub, subject, teacher, room });
+  }
+
+  return out.length ? out : null;
+}`;
+
+const start = js.indexOf("function parseSubgroups");
+let i = js.indexOf("{", start);
+let depth = 1, j = i + 1;
+while(j < js.length && depth > 0){
+  const ch = js[j];
+  if(ch === "{") depth++;
+  else if(ch === "}") depth--;
+  j++;
+}
+js = js.slice(0, start) + newFn + js.slice(j);
+fs.writeFileSync("build.js", js);
+console.log("✔ parseSubgroups обновлён");
+NODE_FIX
+
+echo "▶ Проверяю синтаксис"
+node -c build.js
+echo "  ✔ ok"
+
+echo "▶ Пересобираю"
+node build.js
+
 echo ""
+echo "▶ ПРОВЕРКА:"
+node -e '
+const d = require("./timetable.json");
+const a = d["1"]["Понедельник"]["2"]["ИСиП"];
+console.log(JSON.stringify(a[0].subgroups, null, 2));
+'
 
-# ---------- Что оставляем ----------
-# Исходники + сборка (для разработки)
-KEEP_DEV=(
-  "index.html"
-  "style.css"
-  "app.js"
-  "data.js"
-  "schedule.xlsx"
-  "build.js"
-  "package.json"
-  "package-lock.json"
-  "prepare-pages.sh"
-  "cleanup.sh"
-  "README.md"
-  ".gitignore"
-)
-
-# Только то, что нужно на GitHub Pages
-KEEP_PROD=(
-  "index.html"
-  "style.css"
-  "app.js"
-  "data.js"
-)
-
-# ---------- Что удаляем ----------
-rm -rf .backup_* 2>/dev/null || true
-rm -rf node_modules 2>/dev/null || true
-rm -f  inspect.js inspect.txt 2>/dev/null || true
-rm -f  fix.sh update.sh update2.sh update3.sh update4.sh rollback.sh 2>/dev/null || true
-rm -f  index.html.bak app.js.bak style.css.bak 2>/dev/null || true
-rm -f  REF\ A1AR1001*.txt 2>/dev/null || true
-rm -f  "node build.js.txt" 2>/dev/null || true
-
-echo "✔ Удалены: бэкапы, node_modules, старые скрипты, диагностика"
 echo ""
+echo "▶ Ещё пары:"
+node -e '
+const d = require("./timetable.json");
+const show = (w,day,c,g,p,label) => {
+  const l = (d[w]?.[day]?.[c]?.[g] || []).find(x => x.p === p);
+  if(!l?.subgroups) return;
+  console.log("• " + label);
+  l.subgroups.forEach(sg => console.log("    " + sg.sub + " | " + sg.subject + " | " + sg.teacher + " | " + sg.room));
+};
+show("1","Понедельник","1","ИСиП",3,  "Ин.яз 1п/г Абдуллаева М.А. 308 ЭФ");
+show("1","Понедельник","2","ИСиП",1,  "БД/Ин.яз");
+show("1","Вторник","4","РПИС",3,      "МАиОИ/МиСПИСиТ");
+show("1","Среда","4","РПИС",4,        "ПиРП Омарова М.А");
+'
 
-# ---------- .gitignore ----------
-cat > .gitignore <<'EOF'
-# Артефакты сборки
-node_modules/
-.backup_*/
-dist/
-
-# Отладочное
-inspect.js
-*.bak
-*.tmp
-
-# Системное
-.DS_Store
-Thumbs.db
-EOF
-
-echo "✔ Создан .gitignore"
 echo ""
-
-# ---------- README.md ----------
-cat > README.md <<'README_EOF'
-# 📅 Расписание ФИиИТ
-
-Статический сайт с расписанием занятий факультета информатики и ИТ.
-Работает на GitHub Pages, читает данные из `data.js`, без бэкенда.
-
-## 🚀 Быстрый старт
-
-### Что нужно
-- Любой современный браузер
-- (только для пересборки) Node.js 18+ и `npm`
-
-### Посмотреть локально
-
-Просто откройте `index.html` в браузере — никакой сервер не нужен,
-`fetch` не используется, всё читается из `data.js`.
-
-```bash
-xdg-open index.html   # Linux
-open index.html       # macOS
-start index.html      # Windows
+echo "✅ Готово."
+echo "Бэкап: .backup_$TS.build.js"

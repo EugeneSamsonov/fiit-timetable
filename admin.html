@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b1120">
+<title>Редактор расписания — ФИиИТ</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" class="btn-icon" title="Назад">←</a>
+    <div>
+      <div class="title">Редактор расписания</div>
+      <div class="sub" id="subtitle">выберите направление и правьте пары</div>
+    </div>
+  </div>
+</header>
+
+<div class="pickers">
+  <div class="pick">
+    <label>Курс</label>
+    <select id="courseSelect"></select>
+  </div>
+  <div class="pick">
+    <label>Направление</label>
+    <select id="groupSelect"></select>
+  </div>
+</div>
+
+<div class="week-switch">
+  <button id="weekBtn1" class="week-btn active">1 неделя</button>
+  <button id="weekBtn2" class="week-btn">2 неделя</button>
+</div>
+
+<div class="day-tabs" id="dayTabs"></div>
+
+<main id="editor">
+  <div class="empty">Загрузка…</div>
+</main>
+
+<footer class="editor-actions">
+  <button id="downloadBtn" class="btn-primary">💾 Скачать JSON</button>
+  <button id="applyBtn" class="btn-secondary">✔ Применить локально</button>
+</footer>
+<script src="admin.js"></script>
+</body>
+</html>

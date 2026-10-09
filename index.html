@@ -8,12 +8,16 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <header class="topbar">
   <div class="brand">
     <span class="logo">📅</span>
     <div>
       <div class="title">Расписание ФИиИТ</div>
       <div class="sub" id="subtitle">загрузка…</div>
+    </div>
+    <div class="actions">
+      <a href="admin.html" class="btn-icon" title="Редактор расписания">✎</a>
     </div>
   </div>
 </header>
@@ -28,6 +32,7 @@
     <select id="groupSelect"></select>
   </div>
 </div>
+
 <main id="content">
   <div class="empty">Загрузка расписания…</div>
 </main>
@@ -35,21 +40,45 @@
 <section class="picker-block">
   <div class="section-title"><span class="dot"></span>Посмотреть другой день</div>
 
-  <div class="weekbar">
-    <button id="weekToggle" class="week-toggle">Неделя: 1</button>
+  <div class="week-switch">
+    <button id="weekBtn1" class="week-btn active">1 неделя</button>
+    <button id="weekBtn2" class="week-btn">2 неделя</button>
   </div>
 
   <div class="day-tabs" id="dayTabs"></div>
-
   <div id="pickedContent"></div>
+</section>
+
+<section class="search-block">
+  <div class="section-title"><span class="dot"></span>Поиск по расписанию</div>
+  <p class="hint">
+    Например: <b>4.13</b>, <b>МИЦ</b>, <b>История</b>, <b>Python</b>.
+  </p>
+  <input type="search" id="searchInput" class="input" placeholder="Что искать?">
+  <div id="searchResults" class="search-results"></div>
+</section>
+
+
+<section class="import-block">
+  <div class="section-title"><span class="dot"></span>Расписание в JSON</div>
+  <p class="hint">
+    Скачайте текущее расписание или загрузите своё. Правки сохранятся в браузере.
+    Создать своё расписание можно в <a href="admin.html">редакторе</a>.
+  </p>
+  <div class="import-actions">
+    <button id="downloadBtn" class="btn-file">💾 Скачать JSON</button>
+    <label class="btn-file">
+      📥 Загрузить JSON
+      <input type="file" id="importInput" accept=".json,application/json" hidden>
+    </label>
+    <button id="resetBtn" class="btn-secondary">↺ Сбросить правки</button>
+  </div>
+  <div id="importStatus" class="import-status"></div>
 </section>
 
 <footer>
   <span id="clock"></span>
 </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="data.js"></script>
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

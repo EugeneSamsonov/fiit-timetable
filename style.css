@@ -387,3 +387,441 @@ footer{
   .day-tabs button .dnum{font-size:.8rem}
 }
 /* === update2.sh END === */
+
+/* === update5.sh START === */
+.actions { margin-left: auto; }
+.btn-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--card); color: var(--text);
+  border: 1px solid var(--line);
+  text-decoration: none; font-size: 1.1rem;
+  transition: .15s;
+}
+.btn-icon:hover { background: var(--card2); border-color: var(--blue); }
+
+/* Переключатель недели — две кнопки */
+.week-switch {
+  display: flex; gap: 8px; margin-bottom: 12px;
+}
+.week-btn {
+  flex: 1;
+  background: var(--card); color: var(--muted);
+  border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 14px; font-size: .92rem; font-weight: 700;
+  cursor: pointer; transition: .15s;
+}
+.week-btn:hover { background: var(--card2); }
+.week-btn.active {
+  background: var(--blue); border-color: var(--blue); color: #fff;
+}
+
+/* Табы дней — disabled */
+.day-tabs button.disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+.day-tabs button:disabled:hover { background: var(--card); }
+
+/* Блок импорта */
+.import-block {
+  max-width: 960px; margin: 22px auto 0;
+  padding: 18px 16px 8px;
+  border-top: 1px solid var(--line);
+}
+.import-block .hint {
+  color: var(--muted); font-size: .85rem;
+  margin: 0 0 12px; line-height: 1.5;
+}
+.import-block .hint a { color: var(--blue2); text-decoration: none; }
+.import-block .hint a:hover { text-decoration: underline; }
+.import-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn-file, .btn-primary, .btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 11px 16px; border-radius: 12px;
+  font-size: .9rem; font-weight: 700;
+  cursor: pointer; transition: .15s;
+  border: 1px solid var(--line);
+}
+.btn-file { background: var(--blue); color: #fff; border-color: var(--blue); }
+.btn-file:hover { background: #2563eb; }
+.btn-primary { background: var(--green); color: #052e16; border-color: var(--green); }
+.btn-primary:hover { background: #16a34a; }
+.btn-secondary { background: var(--card); color: var(--text); }
+.btn-secondary:hover { background: var(--card2); border-color: var(--blue); }
+
+/* Редактор */
+.editor-actions {
+  position: sticky; bottom: 0;
+  display: flex; gap: 10px; justify-content: center;
+  padding: 14px 16px calc(env(safe-area-inset-bottom) + 14px);
+  background: rgba(11,17,32,.9);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  margin-top: 30px;
+}
+
+.edit-row {
+  display: grid;
+  grid-template-columns: 44px 96px 1fr 40px;
+  gap: 10px; align-items: flex-start;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px;
+  margin-bottom: 8px;
+}
+.edit-pair {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; height: 32px; border-radius: 8px;
+  background: var(--card2); color: var(--blue2);
+  font-weight: 800; font-size: .9rem;
+  align-self: flex-start;
+}
+.edit-time {
+  font-size: .8rem; color: var(--muted);
+  padding-top: 8px; font-weight: 700;
+}
+.edit-text {
+  width: 100%; resize: vertical;
+  background: var(--bg2); color: var(--text);
+  border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 10px; font-size: .9rem; line-height: 1.4;
+  font-family: inherit;
+  min-height: 42px;
+}
+.edit-text:focus { outline: none; border-color: var(--blue); }
+.edit-clear {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--line);
+  cursor: pointer; font-size: 1rem;
+  align-self: flex-start;
+}
+.edit-clear:hover { background: #7f1d1d; color: #fff; border-color: #7f1d1d; }
+
+/* Импорт на телефоне */
+@media (max-width: 640px){
+  .import-block { padding: 14px 12px 4px; margin-top: 18px; }
+  .import-actions { flex-direction: column; }
+  .btn-file, .btn-secondary, .btn-primary { width: 100%; justify-content: center; }
+  .editor-actions { padding: 12px 12px calc(env(safe-area-inset-bottom) + 12px); flex-direction: column; }
+  .edit-row {
+    grid-template-columns: 32px 1fr 32px;
+    grid-template-areas:
+      "pair time clear"
+      "text text text";
+    gap: 6px;
+  }
+  .edit-pair { grid-area: pair; min-width: 28px; height: 28px; font-size: .8rem; }
+  .edit-time { grid-area: time; padding-top: 4px; }
+  .edit-clear { grid-area: clear; width: 28px; height: 28px; }
+  .edit-text { grid-area: text; }
+}
+/* === update5.sh END === */
+
+
+
+/* === update7.sh START === */
+/* Кнопки недель — по центру, компактные, как было */
+.week-switch {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.week-btn {
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 10px 20px;
+  font-size: .9rem;
+  font-weight: 700;
+  background: var(--card);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .15s;
+}
+.week-btn:hover { background: var(--card2); color: var(--text); }
+.week-btn.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+@media (max-width: 640px){
+  .week-btn { flex: 1 1 0; min-width: 0; padding: 11px 8px; }
+}
+
+/* Input общего назначения */
+.input {
+  width: 100%;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: .95rem;
+  font-family: inherit;
+  transition: .15s;
+}
+.input::placeholder { color: var(--muted); }
+.input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
+
+/* Строка импорта из URL */
+.import-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.import-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.import-status {
+  font-size: .85rem;
+  color: var(--muted);
+  padding: 8px 0;
+  min-height: 1.2em;
+}
+.import-status.ok { color: #86efac; }
+.import-status.err { color: #fca5a5; }
+
+/* Блок поиска */
+.search-block {
+  max-width: 960px;
+  margin: 22px auto 0;
+  padding: 18px 16px 8px;
+  border-top: 1px solid var(--line);
+}
+.search-results { margin-top: 12px; }
+.search-hint { color: var(--muted); font-size: .88rem; padding: 10px 0; }
+.search-count {
+  color: var(--muted); font-size: .82rem;
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 8px; font-weight: 700;
+}
+.search-item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: .15s;
+}
+.search-item:hover {
+  background: var(--card2);
+  border-left-color: var(--blue2);
+}
+.search-meta {
+  display: flex; gap: 8px; align-items: center;
+  font-size: .78rem; color: var(--muted);
+  margin-bottom: 6px; flex-wrap: wrap;
+}
+.search-day { font-weight: 700; color: var(--text); }
+.search-pair { color: var(--blue2); font-weight: 700; }
+.search-text { font-size: .95rem; line-height: 1.4; }
+.search-course { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+
+@media (max-width: 640px){
+  .search-block { padding: 14px 12px 4px; margin-top: 18px; }
+  .import-block { padding: 14px 12px 4px; margin-top: 18px; }
+  .import-row { grid-template-columns: 1fr; }
+  .import-actions { flex-direction: column; }
+  .import-actions > * { width: 100%; justify-content: center; }
+}
+/* === update7.sh END === */
+
+/* === update8.sh START === */
+/* Фикс слипания hint и input */
+.import-block .hint,
+.search-block .hint {
+  margin: 0 0 14px;
+  line-height: 1.55;
+  color: var(--muted);
+  font-size: .88rem;
+}
+.import-block .input,
+.search-block .input {
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+
+/* Стили подгрупп внутри карточки пары */
+.subgroups {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.subgroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 10px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: .92rem;
+}
+.subgroup + .subgroup { margin-top: 2px; }
+
+.sub-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--card2);
+  color: var(--blue2);
+  font-size: .74rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+.sub-subject {
+  font-weight: 600;
+  color: var(--text);
+  flex: 1 1 auto;
+}
+.sub-teacher {
+  color: var(--muted);
+  font-size: .85rem;
+}
+.sub-room {
+  color: var(--muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px){
+  .subgroup {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .sub-subject { font-size: .9rem; }
+}
+/* === update8.sh END === */
+
+
+
+/* === fix-subject.sh START === */
+/* Инпут URL — чтобы кнопка не съезжала */
+.import-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: stretch;
+}
+.import-row .input { margin: 0; }
+
+/* На телефоне — стек: инпут сверху, кнопка снизу */
+@media (max-width: 640px){
+  .import-row {
+    grid-template-columns: 1fr;
+  }
+  .import-row .btn-file { width: 100%; justify-content: center; }
+}
+
+/* Подгруппы: subject теперь снова виден */
+.subgroup {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 8px;
+  align-items: baseline;
+}
+.sub-subject {
+  font-weight: 700;
+  color: var(--text);
+  font-size: .95rem;
+}
+.sub-teacher {
+  color: var(--muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+.sub-room {
+  color: var(--muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px){
+  .subgroup {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "tag  subj"
+      "tag  teacher"
+      "tag  room";
+    row-gap: 2px;
+    column-gap: 8px;
+  }
+  .sub-tag     { grid-area: tag; align-self: start; }
+  .sub-subject { grid-area: subj; }
+  .sub-teacher { grid-area: teacher; }
+  .sub-room    { grid-area: room; }
+}
+/* === fix-subject.sh END === */
+
+/* === fix-admin.sh START === */
+.subgroups { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.subgroup {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 10px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: .92rem;
+}
+.sub-tag {
+  display: inline-flex; align-items: center;
+  background: var(--card2); color: var(--blue2);
+  font-size: .74rem; font-weight: 800;
+  padding: 3px 8px; border-radius: 999px;
+  flex: 0 0 auto;
+}
+.sub-subject {
+  font-weight: 700;
+  color: var(--text);
+  font-size: .95rem;
+  white-space: nowrap;
+}
+.sub-teacher {
+  color: var(--muted);
+  font-size: .85rem;
+  white-space: nowrap;
+}
+.sub-room {
+  color: var(--muted);
+  font-size: .85rem;
+  white-space: nowrap;
+  justify-self: end;
+}
+
+@media (max-width: 640px){
+  .subgroup {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "tag  subj"
+      "tag  teacher"
+      "tag  room";
+    row-gap: 2px;
+    column-gap: 8px;
+  }
+  .sub-tag     { grid-area: tag; align-self: start; }
+  .sub-subject { grid-area: subj; white-space: normal; }
+  .sub-teacher { grid-area: teacher; white-space: normal; }
+  .sub-room    { grid-area: room; justify-self: start; }
+}
+/* === fix-admin.sh END === */
