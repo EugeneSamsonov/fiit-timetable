@@ -55,17 +55,29 @@ function parseSubgroups(text){
     const m = p.match(/^(.*?)\s*(\d+п\/г)\s*(.*)$/);
     if(!m) continue;
 
-    const prefix = m[1].trim();      // ← "БД", "Ин.яз" (предмет до 1п/г)
-    const sub    = m[2];             // ← "1п/г"
-    let rest     = m[3].trim();      // ← "Шахбанова З.И. 2.3"
+    const prefix = m[1].trim();
+    const sub    = m[2];
+    let rest     = m[3].trim();
 
-    // 1. Аудитория с конца
+    // 0. СЛИПШАЯСЯ аудитория: "Сулейманова М.А.ПО" → room="ПО"
+    //    Ищем: точка после инициала + сразу аудитория БЕЗ пробела.
     let room = "";
-    const roomRe = /\s([0-9]{1,2}\.[0-9]{1,2}|[0-9]{3}\s*ЭФ|ВЦ|МИЦ|ПО|планет|Спортзал)$/i;
-    const rm = rest.match(roomRe);
-    if(rm){
-      room = rm[1].trim();
-      rest = rest.slice(0, rest.length - rm[0].length).trim();
+    const gluedRoom = /([А-ЯЁа-яё])\.([0-9]{1,2}\.[0-9]{1,2}|[0-9]{3}\s*ЭФ|ВЦ|МИЦ|ПО|планет|Спортзал)$/i;
+    const grm = rest.match(gluedRoom);
+    if(grm){
+      room = grm[2].trim();
+      // отрезаем только аудиторию, точку оставляем в teacher
+      rest = rest.slice(0, rest.length - grm[2].length).trim();
+    }
+
+    // 1. Обычная аудитория с конца (с пробелом)
+    if(!room){
+      const roomRe = /\s([0-9]{1,2}\.[0-9]{1,2}|[0-9]{3}\s*ЭФ|ВЦ|МИЦ|ПО|планет|Спортзал)$/i;
+      const rm = rest.match(roomRe);
+      if(rm){
+        room = rm[1].trim();
+        rest = rest.slice(0, rest.length - rm[0].length).trim();
+      }
     }
 
     // 2. Преподаватель с конца
@@ -80,17 +92,7 @@ function parseSubgroups(text){
       rest = rest.slice(0, tm.index).trim();
     }
 
-    // 3. Если остался хвост "ПО"/"МИЦ" и room пуст
-    if(!room){
-      const tailRoom = /\s([0-9]{1,2}\.[0-9]{1,2}|[0-9]{3}\s*ЭФ|ВЦ|МИЦ|ПО|планет|Спортзал)$/i;
-      const tr = rest.match(tailRoom);
-      if(tr){
-        room = tr[1].trim();
-        rest = rest.slice(0, rest.length - tr[0].length).trim();
-      }
-    }
-
-    // 4. Если teacher всё ещё пуст — последняя попытка
+    // 3. Если teacher пуст — ещё раз с хвостом
     if(!teacher){
       const t2 = rest.match(/\s([А-ЯЁ][а-яёА-ЯЁ\-]+\s+[А-ЯЁ]\.\s*[А-ЯЁ]\.?)$/);
       if(t2){
@@ -99,15 +101,12 @@ function parseSubgroups(text){
       }
     }
 
-    // 5. ПРЕДМЕТ = prefix (то, что было до 1п/г), либо остаток rest
+    // 4. Предмет
     let subject = prefix;
-    if(!subject){
-      subject = rest.replace(/^[;,.·\s]+|[;,.·\s]+$/g, "").trim();
-    }
+    if(!subject) subject = rest.replace(/^[;,.·\s]+|[;,.·\s]+$/g, "").trim();
 
     out.push({ sub, subject, teacher, room });
   }
-
   return out.length ? out : null;
 }
 
